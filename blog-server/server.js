@@ -11,11 +11,19 @@ app.use(bodyParser.json());
 const dbConnect = require("./config/DBconnection");
 dbConnect();
 
-const authRoutes = require('./routes/authRoutes')
+const authRoutes = require("./routes/authRoutes");
 
-app.use('/v1/user',authRoutes)
+app.use("/v1/user", authRoutes);
 
+// error handeling
+const errorHandeling = (error, req, res, next) => {
+  if (req.headersSent) {
+    return next(error);
+  }
+  res.status(500).json({ error });
+};
 
+app.use(errorHandeling);
 
 app.listen(port, () => {
   console.log(`server is runing on ${port}`);
