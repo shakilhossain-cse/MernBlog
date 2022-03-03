@@ -31,10 +31,24 @@ const registerController = async (req, res) => {
     password: hash,
   });
   await newUser.save();
-  res.status(200).json({
-    success: true,
-    msg: "Registered Successfull.",
-  });
+  //   genarate token
+  if (newUser) {
+    var token = jwt.sign(
+      {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      },
+      process.env.JWTSECRECT_TOKEN,
+      { expiresIn: "1h" }
+    );
+    res.status(200).json({
+      success: true,
+      msg: "Registered Successfull.",
+      access_token: token,
+    });
+  }
 };
 
 const loginController = async (req, res) => {
@@ -73,9 +87,11 @@ const loginController = async (req, res) => {
     process.env.JWTSECRECT_TOKEN,
     { expiresIn: "1h" }
   );
-  res
-    .status(200)
-    .json({ access_token: token, msg: "your are login successfully" });
+  res.status(200).json({
+    access_token: token,
+    success: true,
+    msg: "your are login successfully",
+  });
   console.log(comparePassword);
 };
 
